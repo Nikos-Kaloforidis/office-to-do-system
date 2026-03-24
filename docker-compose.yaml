@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:16
+    container_name: office_todo_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: officeToDo
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - todo_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://Administrator:admin@db:5432/officeToDo
+    volumes:
+      - .:/workspace
+    depends_on:
+      db:
+        condition: service_healthy # Only starts backend once DB is actually "ready"
+    ports:
+      - "8000:8000"
+    networks:
+      - todo_network
+    # Use 'sh -c' to ensure env variables are parsed correctly in some shells
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+    environment:
+      - BACKEND_URL=http://backend:8000
+    volumes:
+      - .:/workspace
+    depends_on:
+      - backend
+    ports:
+      - "8501:8501"
+    networks:
+      - todo_network
+
+networks:
+  todo_network:
+    driver: bridge
+
+volumes:
+  db_data:

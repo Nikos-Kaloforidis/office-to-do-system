@@ -1,0 +1,20 @@
+[project]
+name = "office-todo-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic-settings",
+    "sqlalchemy",
+    "alembic",
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "python-multipart",
+    "streamlit",
+    "httpx",
+    "websockets",
+    "psycopg2-binary>=2.9.11",
+]

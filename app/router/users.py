@@ -1,8 +1,10 @@
-from fastapi import APIRouter,status,Response,Depends
+from fastapi import APIRouter,status,Response,Depends, HTTPException
 from sqlalchemy.orm import Session
-from ..crud.user import get_user, create_user , get_all_users,delete_user,update_user_password
+from ..crud.user import get_user, create_user , get_all_users,delete_user,update_user_password ,add_user_department
 from ..schemas.user import User,UserCreate
 from ..database import get_db
+from ..auth.jwt import authenticate_user
+from ..auth.schemas import UserLogin
 
 user_router = APIRouter(
     prefix="/users",
@@ -52,6 +54,28 @@ def updateUserAdminRights():
     pass
     
 
+@user_router.put("/update/department")
+def update_department(id:int ,depart_id:int, db:Session=Depends(get_db)): 
+    user = add_user_department(user_id = id ,db = db , dep_id = depart_id)
+    if user: 
+        return Response(status_code=status.HTTP_202_ACCEPTED,content=f"User with id {id} updated succesfully")
+    else:
+        return Response(status_code=status.HTTP_404_NOT_FOUND, content=f"User with id {id} is not found")
 
 
+@user_router.post("/authenticate/")
+def login(user:UserLogin, db:Session=Depends(get_db)): 
+    token = authenticate_user(user_auth=user, db =db) 
 
+    if  not token: 
+        raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Incorrect username or password",
+                    headers={"WWW-Authenticate": "Bearer"}, )   
+                    
+    return Response(status_code=status.HTTP_202_ACCEPTED,content=f"Authorization successfull, token :{token}")
+
+
+@user_router.get("/me")
+def get_my_info(): 
+    pass 

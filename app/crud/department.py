@@ -1,5 +1,6 @@
 from ..schemas.user import Department as DepartmentSchema
 from sqlalchemy.orm import Session
+from ..models.user import User  as UserModel 
 from ..models.user import Department as DepartmentModel
 
 
@@ -29,3 +30,9 @@ def deleteDepartment(dep_id:int,db:Session):
         db.refresh(query)
     
     return department
+
+def getEmployeesDepartment(dep_id:int,db:Session):
+    return db.query(UserModel).filter(dep_id == UserModel.dep_id).all()
+
+
+

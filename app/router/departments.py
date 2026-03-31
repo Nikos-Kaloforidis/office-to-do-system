@@ -1,6 +1,6 @@
 from fastapi import APIRouter,status,Response,Depends
 from sqlalchemy.orm import Session
-from ..crud.department import deleteDepartment,getAllDepartments,getDepartment,addDepartment
+from ..crud.department import deleteDepartment,getAllDepartments,getDepartment,addDepartment ,getEmployeesDepartment
 from ..schemas.user import Department as DepartmentSchema
 from ..database import get_db
 
@@ -39,3 +39,14 @@ def createDepartment(department_new: DepartmentSchema , db_instance:Session=Depe
 @department_router.delete("/remove")
 def removeDepartment(id:int , db_instance:Session=Depends(get_db)): 
     deleteDepartment(dep_id = id , db= db_instance)
+
+@department_router.get("/all_users")
+def getAllUsersFromDepartment(id:int,db_instance:Session=Depends(get_db)):
+    response = getEmployeesDepartment(id,db_instance)
+    employee_list = [f'{emp.firstName} {emp.lastName}' for emp in response]
+    employee_str = ", ".join(employee_list)
+
+    if  not employee_list: 
+        return Response(status_code=status.HTTP_204_NO_CONTENT,content="This Department has no people yet")
+    return Response(status_code=status.HTTP_200_OK,content= f"Employee List : {employee_str}")
+

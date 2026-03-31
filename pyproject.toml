@@ -17,4 +17,5 @@ dependencies = [
     "httpx",
     "websockets",
     "psycopg2-binary>=2.9.11",
+    "argon2-cffi>=25.1.0",
 ]

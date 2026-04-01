@@ -1,5 +1,5 @@
 from fastapi import Depends
-from ..schemas.user import User, UserCreate
+from ..schemas.user import  UserCreate
 from ..models.user import User as UserModel
 from sqlalchemy.orm import Session
 from ..auth.jwt import hash_password
@@ -12,7 +12,6 @@ def create_user(user_input: UserCreate,db:Session):
         username=user_input.username,
         password = hash_password(user_input.password),
         dep_id = user_input.dep_id,
-        role_id = user_input.role_id
     )
     db.add(db_user)
     db.commit()
@@ -33,6 +32,7 @@ def update_user_password(user_id: int, password: str, db: Session):
         user.lastName = user.lastName
         user.username = user.username
         user.password = hash_password(password)
+        user.dep_id = user.dep_id
         db.commit()
         db.refresh(user)
         return user

@@ -1,52 +1,51 @@
-from fastapi import APIRouter,status,Response,Depends
+from fastapi import APIRouter, status, Depends, HTTPException
 from sqlalchemy.orm import Session
-from ..crud.department import deleteDepartment,getAllDepartments,getDepartment,addDepartment ,getEmployeesDepartment
-from ..schemas.user import Department as DepartmentSchema
+from typing import List
+from ..crud.department import (
+    deleteDepartment, getAllDepartments, getDepartment, 
+    addDepartment, getEmployeesDepartment
+)
+from ..schemas.department import (
+     DepartmentResponse, DepartmentListResponse, 
+    DepartmentCreate  # Updated schemas
+)
+from ..schemas.user import UserResponse
 from ..database import get_db
 
 department_router = APIRouter(
     prefix="/department",
     tags=["Department"],
-    responses= {404: {"description": "Not found"}},
+    responses={404: {"description": "Not found"}},
 )
 
-@department_router.get("/show/all")
-def showAllDepartments(db_instance:Session=Depends(get_db)): 
-    response = getAllDepartments(db=db_instance)
-    dep_list  = [dep.name for dep in response]
-    department_str = ", ".join(dep_list)
-    if response: 
-        return Response(status_code=status.HTTP_200_OK,content=f"Departments: {department_str}",media_type="text/plain")
-    return Response(status_code=status.HTTP_204_NO_CONTENT,content=f"There are no departments in the system",media_type="text/plain") 
+@department_router.get("/show/all", response_model=DepartmentListResponse)
+def showAllDepartments(db: Session = Depends(get_db)):
+    departments = getAllDepartments(db)
+    return {"departments": departments}
 
-@department_router.get("/show/{id}")
-def showDepartment(id:int,db_instance:Session=Depends(get_db)): 
-    department  = getDepartment(dep_id=id,db=db_instance)
+@department_router.get("/show/{id}", status_code=status.HTTP_200_OK, response_model=DepartmentResponse)
+def showDepartment(id: int, db: Session = Depends(get_db)):
+    department = getDepartment(dep_id=id, db=db)
+    if not department:
+        raise HTTPException(status_code=404, detail=f"Department with id {id} not found")
+    return department
 
-    if department:
-        return Response(status_code=status.HTTP_200_OK,content=f"Current departments: {department.name}")
-    return Response(status_code=status.HTTP_404_NOT_FOUND,content=f"No department with {department.name} found",  media_type="text/plain")
+@department_router.post("/add", status_code=status.HTTP_201_CREATED, response_model=DepartmentResponse)
+def createDepartment(department_new: DepartmentCreate, db: Session = Depends(get_db)):
+    new_dep = addDepartment(department_input=department_new, db=db)
+    if not new_dep:
+        raise HTTPException(status_code=400, detail="Could not create department")
+    return new_dep
 
+@department_router.delete("/remove/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def removeDepartment(id: int, db: Session = Depends(get_db)):
+    success = deleteDepartment(dep_id=id, db=db)
+    if not success:
+        raise HTTPException(status_code=404, detail=f"Department with id {id} not found")
 
-@department_router.post("/add")
-def createDepartment(department_new: DepartmentSchema , db_instance:Session=Depends(get_db)): 
-    new_dep  = addDepartment(department_input=department_new,db=db_instance)
-
-    if new_dep: 
-        return Response(status_code=status.HTTP_201_CREATED,content = "Department Created Successfully")
-    return Response(status_code=status.HTTP_404_NOT_FOUND,content ="Could not create department")
-
-@department_router.delete("/remove")
-def removeDepartment(id:int , db_instance:Session=Depends(get_db)): 
-    deleteDepartment(dep_id = id , db= db_instance)
-
-@department_router.get("/all_users")
-def getAllUsersFromDepartment(id:int,db_instance:Session=Depends(get_db)):
-    response = getEmployeesDepartment(id,db_instance)
-    employee_list = [f'{emp.firstName} {emp.lastName}' for emp in response]
-    employee_str = ", ".join(employee_list)
-
-    if  not employee_list: 
-        return Response(status_code=status.HTTP_204_NO_CONTENT,content="This Department has no people yet")
-    return Response(status_code=status.HTTP_200_OK,content= f"Employee List : {employee_str}")
-
+@department_router.get("/all_users/{id}", response_model=List[UserResponse])
+def getAllUsersFromDepartment(id: int, db: Session = Depends(get_db)):
+    users = getEmployeesDepartment(id, db)
+    if not users:
+        raise HTTPException(status_code=404, detail="Department has no employees or not found")
+    return users

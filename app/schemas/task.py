@@ -2,7 +2,8 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
-from ..schemas.user import User, Department  
+from ..schemas.user import UserBase
+from ..schemas.department import DepartmentBase  
 
 
 
@@ -36,10 +37,10 @@ class TaskResponse(TaskBase):
     created_at: Optional[datetime] = None
     timestamp: Optional[datetime] = None
     
-    created_by: User
-    assigned_user: Optional[User] = None
+    created_by: UserBase
+    assigned_user: Optional[UserBase] = None
     
-    assigned_department: Optional[Department] = None
+    assigned_department: Optional[DepartmentBase] = None
 
     class Config:
         from_attributes = True

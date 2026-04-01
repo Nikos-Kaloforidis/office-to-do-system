@@ -1,27 +1,24 @@
-from pydantic import BaseModel 
-from typing import Optional
-from datetime import datetime
+from pydantic import BaseModel, ConfigDict
+from typing import Optional, List
 
-
-class User(BaseModel):
+class UserBase(BaseModel):
     firstName: str
     lastName: str
     username: str
     dep_id: Optional[int] = None
-   # role_id: Optional[int] = None
 
-class Department(BaseModel):
-    name: str
-    domain: Optional[str] = None
+class UserCreate(UserBase):
+    password: str
 
-# class Role(BaseModel):
-#     name: str
-#     description: Optional[str] = None
-#     admin_rights: bool = False
-#     dep_id: Optional[int] = None
+class UserResponse(UserCreate):
+    user_id: int
+    
+    model_config = ConfigDict(from_attributes=True)  
 
-class UserCreate(User): 
-    password: str 
+class UserListResponse(BaseModel):
+    users: List[UserResponse]
+    
+    model_config = ConfigDict(from_attributes=True)
 
 class UserUpdate(BaseModel):
     firstName: Optional[str] = None
@@ -29,14 +26,3 @@ class UserUpdate(BaseModel):
     username: Optional[str] = None
     password: Optional[str] = None
     dep_id: Optional[int] = None
-    #role_id: Optional[int] = None
-
-class DepartmentUpdate(BaseModel):
-    name: Optional[str] = None
-    domain: Optional[str] = None
-
-# class RoleUpdate(BaseModel):
-#     name: Optional[str] = None
-#     description: Optional[str] = None
-#     admin_rights: Optional[bool] = None
-#     dep_id: Optional[int] = None

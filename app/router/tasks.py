@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from ..crud.task import (
     get_task, get_tasks, create_task, update_task, delete_task, 
-    count_tasks, get_department_tasks
+    count_tasks, get_department_tasks,get_user_assigned_tasks
 )
 from ..schemas.task import TaskCreate, TaskResponse, TaskList, TaskUpdate
 from ..database import get_db
@@ -27,7 +27,7 @@ def read_tasks(
 ):
     tasks = get_tasks(db, skip=skip, limit=limit, status=status)
     total = count_tasks(db)
-    return TaskList(tasks=tasks, total=total)
+    return {"tasks":tasks,"total":total}
 
 @task_router.get("/{task_id}", response_model=TaskResponse)
 def read_task(task_id: int, db: Session = Depends(get_db)):
@@ -56,7 +56,7 @@ def delete_task_route(task_id: int, db: Session = Depends(get_db)):
 
 @task_router.get("/user/{user_id}")
 def get_user_tasks(user_id: int, db: Session = Depends(get_db)):
-    tasks = get_user_tasks(db, user_id)
+    tasks = get_user_assigned_tasks(db = db, user_id = user_id)
     return {"tasks": tasks, "total": len(tasks)}
 
 @task_router.get("/department/{dep_id}")

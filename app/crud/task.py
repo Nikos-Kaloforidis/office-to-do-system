@@ -1,9 +1,5 @@
 from ..models.task import Task as TaskModel 
-from ..models.task import TaskStatus 
-from ..models.user import User , Department
 from ..schemas.task import TaskCreate,TaskUpdate
-from ..schemas.user import User as UserSchema 
-from ..schemas.user import Department as DepartmentSchema 
 from typing import List,Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
@@ -93,19 +89,36 @@ def create_task(db: Session, task: TaskCreate) -> TaskModel:
     return db_task
 
 def update_task(db: Session, task_id: int, task_update: TaskUpdate) -> Optional[TaskModel]:
-    """Update existing task"""
     db_task = db.query(TaskModel).filter(TaskModel.task_id == task_id).first()
     if not db_task:
         return None
     
-    update_data = task_update.dict(exclude_unset=True)
+    # Use model_dump for Pydantic v2 consistency
+    update_data = task_update.model_dump(exclude_unset=True)
+    
+    # Handle Status Mapping (Crucial for DB consistency)
+    if "status" in update_data and update_data["status"]:
+        status_map = {
+            "requested": "REQUESTED",
+            "seen": "SEEN", 
+            "working": "WORKING",
+            "completed": "COMPLETED"
+        }
+        
+        # Get the value (handle if it's an Enum or raw string)
+        val = update_data["status"]
+        status_str = val.value if hasattr(val, "value") else str(val)
+        
+        # Update the dictionary with the uppercase version
+        update_data["status"] = status_map.get(status_str.lower(), "REQUESTED")
+
+    # Apply all updates
     for field, value in update_data.items():
         setattr(db_task, field, value)
     
     db.commit()
     db.refresh(db_task)
     return db_task
-
 def count_tasks(db: Session) -> int:
     """Count total tasks"""
     return db.query(TaskModel).count()

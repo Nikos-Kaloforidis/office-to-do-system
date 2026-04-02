@@ -3,7 +3,7 @@ from utils.api_client import client
 
 from app.auth.jwt import verify_password
 
-st.set_page_config(page_title="Admin Control", layout="wide")
+st.set_page_config(page_title="Profile Settings", layout="wide")
 
 if st.session_state.get("logged_in"):
     st.header("Profile Settings")

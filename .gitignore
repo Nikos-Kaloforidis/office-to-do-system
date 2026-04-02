@@ -79,4 +79,4 @@ tox/
 tmp/
 temp/
 
-alembic/
+alembic/versions/

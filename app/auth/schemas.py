@@ -1,13 +1,16 @@
-from pydantic import BaseModel 
+from pydantic import BaseModel
 from typing import Optional
 
-class Token(BaseModel): 
-    access_token:str 
-    token_type:str
 
-class TokenData(Token): 
-    username:Optional[str] = None 
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
-class UserLogin(BaseModel): 
-    username:str 
-    password: str 
+
+class TokenData(Token):
+    username: Optional[str] = None
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str

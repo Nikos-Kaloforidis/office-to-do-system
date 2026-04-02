@@ -1,17 +1,22 @@
-import os 
-from sqlalchemy import create_engine 
-from sqlalchemy.orm import sessionmaker,declarative_base
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+from dotenv import load_dotenv
 
-DATABASE_URL = 'postgresql://admin:admin@localhost:5432/postgres'
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+#'postgresql://admin:admin@localhost:5432/postgres'
 
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL environment variable is not set")
 
 engine = create_engine(DATABASE_URL)
 
-SessionLocal = sessionmaker(bind=engine,autocommit=False, autoflush=False)
+SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 Base = declarative_base()
+
 
 def get_db():
     db = SessionLocal()
@@ -19,4 +24,3 @@ def get_db():
         yield db
     finally:
         db.close()
-

@@ -1,5 +1,6 @@
 import streamlit as st
 
+
 def render_header(user_data, department_data):
     # Background styling for the bar
     st.markdown(
@@ -28,8 +29,8 @@ def render_header(user_data, department_data):
             margin-left: 10px;
         }
         </style>
-        """, 
-        unsafe_allow_html=True
+        """,
+        unsafe_allow_html=True,
     )
 
     with st.container():
@@ -42,23 +43,25 @@ def render_header(user_data, department_data):
                     <span class="dept-badge">{department_data['name']}</span>
                 </div>
             </div>
-            """, 
-            unsafe_allow_html=True
+            """,
+            unsafe_allow_html=True,
         )
-        
+
         # Action Buttons positioned right below the bar for clarity
         col_nav1, col_nav2, col_spacer, col_logout = st.columns([1.5, 1.5, 4, 1])
-        
+
         with col_nav1:
             if st.button("Create Task", use_container_width=True, key="header_create"):
                 st.switch_page("pages/1_Create_New_Task.py")
-                
+
         with col_nav2:
             if st.button("View My Tasks", use_container_width=True, key="header_view"):
                 st.switch_page("pages/2_My_Tasks.py")
-                
+
         with col_logout:
-            if st.button("Logout", type="primary", use_container_width=True, key="header_logout"):
+            if st.button(
+                "Logout", type="primary", use_container_width=True, key="header_logout"
+            ):
                 st.session_state.client.logout()
                 st.rerun()
 

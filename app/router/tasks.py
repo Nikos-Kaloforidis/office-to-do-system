@@ -1,6 +1,6 @@
-from fastapi import APIRouter,status,Response,Depends, HTTPException,Query
+from fastapi import APIRouter,Depends, HTTPException,Query
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import Optional
 from ..crud.task import (
     get_task, get_tasks, create_task, update_task, delete_task, 
     count_tasks, get_department_tasks,get_user_assigned_tasks
@@ -48,7 +48,7 @@ def update_existing_task(
     return updated_task
 
 @task_router.delete("/{task_id}", status_code=204)
-def delete_task(task_id: int, db: Session = Depends(get_db)):
+def remove_task(task_id: int, db: Session = Depends(get_db)):
     success = delete_task(db, task_id)
     if not success:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -60,6 +60,6 @@ def get_user_tasks(user_id: int, db: Session = Depends(get_db)):
     return {"tasks": tasks, "total": len(tasks)}
 
 @task_router.get("/department/{dep_id}")
-def get_user_tasks(dep_id: int, db: Session = Depends(get_db)):
+def get_department_tasks_route(dep_id: int, db: Session = Depends(get_db)):
     tasks = get_department_tasks(db, dep_id)
     return {"tasks": tasks, "total": len(tasks)}

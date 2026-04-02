@@ -46,7 +46,7 @@ def render_task_card(task, prefix):
                             client.patch(f"api/tasks/{task_id}", {"status": new_status})
                             st.session_state.editing_task = None
                             st.rerun()
-                        except Exception as e:
+                        except Exception:
                             st.error("Update failed")
                 with s2:
                     if st.button("X", key=f"{prefix}_can_{task_id}"):
@@ -174,7 +174,8 @@ else:
     try:
         depts_data = client.get("/api/department/show/all").get("departments", [])
         users_data = client.get("/api/users/show/all").get("users", [])
-    except:
+    except Exception as e:
+        print(f"Error {e}")
         depts_data, users_data = [], []
 
     with st.form("new_task_form", clear_on_submit=True):

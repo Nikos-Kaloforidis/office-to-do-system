@@ -1,7 +1,6 @@
-import pytest
 from app.models.user import User as UserModel
 from app.models.user import Department as DepartmentModel
-from .utils import login_user, get_test_user
+from .utils import login_user
 
 
 def test_show_all_users(client, db_session):

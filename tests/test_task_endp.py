@@ -1,4 +1,3 @@
-import pytest
 from app.models.user import User as UserModel
 from app.models.task import Task as TaskModel
 from .utils import login_user

@@ -1,4 +1,3 @@
-from fastapi import Depends
 from ..schemas.user import UserCreate
 from ..models.user import User as UserModel
 from sqlalchemy.orm import Session

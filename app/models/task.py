@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
 from enum import Enum as PyEnum
 from sqlalchemy.dialects.postgresql import ENUM  # PostgreSQL specific
 from ..database import Base

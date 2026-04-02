@@ -1,4 +1,3 @@
-import pytest
 from app.models.user import Department as DepartmentModel
 from app.models.user import User as UserModel
 from .utils import login_user

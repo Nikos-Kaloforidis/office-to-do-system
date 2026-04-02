@@ -1,5 +1,4 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import delete
 from ..schemas.department import DepartmentCreate
 from ..models.user import User as UserModel
 from ..models.user import Department as DepartmentModel  # Fixed import

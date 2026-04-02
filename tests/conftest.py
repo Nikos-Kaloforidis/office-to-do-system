@@ -1,17 +1,17 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.database import Base, get_db  # Import your real Base and get_db
-from app.main import app  # Import your FastAPI app
+from app.database import Base, get_db 
+from app.main import app  
 from fastapi.testclient import TestClient
 from dotenv import load_dotenv
 import os
 
-load_dotenv
-# 1. Point to the TEST database port (5433)
+load_dotenv()
+
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
 
-# 2. Create a separate engine for testing
+
 test_engine = create_engine(TEST_DATABASE_URL)
 TestingSessionLocal = sessionmaker(bind=test_engine, autocommit=False, autoflush=False)
 

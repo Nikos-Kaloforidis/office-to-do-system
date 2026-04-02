@@ -6,19 +6,19 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-#'postgresql://admin:admin@localhost:5432/postgres'
 
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL environment variable is not set")
-
-engine = create_engine(DATABASE_URL)
-
-SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+if DATABASE_URL:
+    engine = create_engine(DATABASE_URL)
+    SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+else:
+    engine = None
+    SessionLocal = None
 
 Base = declarative_base()
 
-
 def get_db():
+    if SessionLocal is None:
+        raise ValueError("DATABASE_URL environment variable is not set")
     db = SessionLocal()
     try:
         yield db
